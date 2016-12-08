@@ -1,10 +1,10 @@
-app.factory("itemStorage", function($q, $http, firebaseURL, AuthFactory){
+app.factory("itemStorage", function($q, $http, FIREBASE_CONFIG, AuthFactory){
 	
 	var getItemList = function(){
 		var items = [];
         let user = AuthFactory.getUser();
 		return $q(function(resolve, reject){
-			$http.get(`${firebaseURL}items.json?orderBy="uid"&equalTo="${user.uid}"`)
+			$http.get(`${FIREBASE_CONFIG.databaseURL}/items.json?orderBy="uid"&equalTo="${user.uid}"`)
 				.success(function(itemObject){
 					var itemCollection = itemObject;
 					Object.keys(itemCollection).forEach(function(key){
@@ -22,7 +22,7 @@ app.factory("itemStorage", function($q, $http, firebaseURL, AuthFactory){
 	var deleteItem = function(itemId){
 		return $q(function(resolve, reject){
 			$http
-            	.delete(firebaseURL + "items/" + itemId + ".json")
+            	.delete(FIREBASE_CONFIG.databaseURL + "/items/" + itemId + ".json")
             	.success(function(objectFromFirebase){
             		resolve(objectFromFirebase);
             	});
@@ -34,7 +34,7 @@ app.factory("itemStorage", function($q, $http, firebaseURL, AuthFactory){
         console.log("user", user)
         return $q(function(resolve, reject) {
             $http.post(
-                firebaseURL + "items.json",
+                FIREBASE_CONFIG.databaseURL + "/items.json",
                 JSON.stringify({
                     assignedTo: newItem.assignedTo,
                     dependencies: newItem.dependencies,
@@ -56,7 +56,7 @@ app.factory("itemStorage", function($q, $http, firebaseURL, AuthFactory){
 
 	var getSingleItem = function(itemId){
 		return $q(function(resolve, reject){
-			$http.get(firebaseURL + "items/"+ itemId +".json")
+			$http.get(FIREBASE_CONFIG.databaseURL + "/items/"+ itemId +".json")
 				.success(function(itemObject){
 					resolve(itemObject);
 				})
@@ -70,7 +70,7 @@ app.factory("itemStorage", function($q, $http, firebaseURL, AuthFactory){
         let user = AuthFactory.getUser();
         return $q(function(resolve, reject) {
             $http.put(
-                firebaseURL + "items/" + itemId + ".json",
+                FIREBASE_CONFIG.databaseURL + "/items/" + itemId + ".json",
                 JSON.stringify({
                     assignedTo: newItem.assignedTo,
                     dependencies: newItem.dependencies,
@@ -93,7 +93,7 @@ app.factory("itemStorage", function($q, $http, firebaseURL, AuthFactory){
 		var updateCompletedStatus = function(newItem){
         return $q(function(resolve, reject) {
             $http.put(
-                firebaseURL + "items/" + newItem.id + ".json",
+                FIREBASE_CONFIG.databaseURL + "/items/" + newItem.id + ".json",
                 JSON.stringify({
                     assignedTo: newItem.assignedTo,
                     dependencies: newItem.dependencies,

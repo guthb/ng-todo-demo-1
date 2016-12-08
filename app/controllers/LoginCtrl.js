@@ -1,7 +1,7 @@
 "use strict";
 
-app.controller("LoginCtrl", function($scope, $rootScope, $location, firebaseURL, AuthFactory){
-	let ref = new Firebase(firebaseURL);
+app.controller("LoginCtrl", function($scope, $rootScope, $location, AuthFactory){
+	// let ref = new Firebase(firebaseURL);
 
 	// $scope.hasUser = false;
 
@@ -12,45 +12,25 @@ app.controller("LoginCtrl", function($scope, $rootScope, $location, firebaseURL,
 
 
 	if($location.path() === "/logout"){
-		ref.unauth();
+		AuthFactory.logout();// ref.unauth();
 		$rootScope.isActive = false;
+		$location.url('/login');
 	}
 
 	$scope.register = () => {
 		console.log("you clicked register");
-		ref.createUser({
-			email: $scope.account.email,
-			password: $scope.account.password
-		}, (error, userData) => {
-			if(error){
-				console.log(`Error creating user: ${error}`)
-			} else{
-				console.log(`Created user account with uid: ${userData.uid}`)
-				$scope.login();
-			}
+		AuthFactory.registerWithEmail($scope.account).then(function(){
+			$scope.login();
 		});
 	};
 
-
 	$scope.login = () => {
 		console.log("you clicked login");
-		AuthFactory
-			.authenticate($scope.account)
+		AuthFactory.authenticate($scope.account)
 			.then(() => {
-				// $scope.hasUser = true;
 				$rootScope.isActive = true;
 				$location.path("/");
-				$scope.$apply();
 			})
-
-
-
-
-
-
-
-
-
 	};
 
 })
